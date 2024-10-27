@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://kit.fontawesome.com/ac42c3b1f7.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./todo.css">
+  </head>
+  <body>
+    <div class="todos-bg-container">
+            <h1 class="todos-heading">ToDo Application</h1>
+            <h1 class="create-task-heading">
+              Create <span class="create-task-heading-subpart">Todo</span>
+            </h1>
+            <input type="text" id="todoUserInput" class="todo-user-input" placeholder="What needs to be done?"/>
+            <p  id="success-message"class="success-task"> Your Task Has Added Successfully and <span class="show-span">Click on Show Tasks To See Tasks.</span></p>
+            <button class="button" id="addTodoButton" >Add</button>
+            <button class="button" id="getTodoButton">Show Tasks</button>
+            <h1 class="todo-items-heading">
+              My <span class="todo-items-heading-subpart">Todo's</span>
+            </h1>
+            <ul class="todo-items-container" id="taskItemsContainer"></ul>
+            <button class="button" id="saveTodoButton">Save</button>
+    </div>
+    <script src="./todo.js"></script>
+  </body>
+</html>
