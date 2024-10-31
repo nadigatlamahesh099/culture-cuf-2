@@ -4,9 +4,9 @@ const Task = require('../backend/TaskModel');
 
 // POST /transactions: Add a new transaction
 router.post('/add-task', async (req, res) => {
-  const { name, status } = req.body;
+  const { name, status ,date} = req.body;
   try {
-    const newTask = new Task({ name, status });
+    const newTask = new Task({ name, status,date });
     await newTask.save();
     res.status(201).json(newTask);
     
@@ -29,11 +29,14 @@ router.get('/all-tasks', async (req, res) => {
 
 
 // PUT /transactions/:id: Update a specific transaction
-router.put('/:id', async (req, res) => {
+router.put('/put/:id', async (req, res) => {
+  console.log(req.body.status)
+  
   try {
-    const updatedTransaction = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedTransaction = await Task.findByIdAndUpdate(req.params.id,req.body, { status :req.body.status});
+    const allTasks = await Task.find();
     if (!updatedTransaction) return res.status(404).json({ error: 'Transaction not found' });
-    res.status(200).json(updatedTransaction);
+    res.status(200).json(allTasks);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
