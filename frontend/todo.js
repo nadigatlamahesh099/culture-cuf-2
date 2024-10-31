@@ -5,31 +5,38 @@ let taskItemsContainer = document.getElementById("taskItemsContainer");
 let addTodoButton = document.getElementById("addTodoButton");
 let successMessage =document.getElementById("success-message")
 
+const onTaskStatusChange = async (checkboxId, labelId, taskId,task,data) => {
+  let checkboxElement = document.getElementById(checkboxId);
+  let labelElement = document.getElementById(labelId);
+  labelElement.classList.toggle("checked");
+  let statusValue="";
+  if (task.status === "false") {
+    statusValue="true";
+  }else if (task.status === "true"){
+    statusValue="false";
+  }
+  console.log(statusValue)
 
-function onTaskStatusChange(checkboxId, labelId, taskId,data) {
-    let checkboxElement = document.getElementById(checkboxId);
-    let labelElement = document.getElementById(labelId);
-    labelElement.classList.toggle("checked");
-  
-    let taskObjectIndex = data.findIndex(function(eachTask) {
-      if (eachTask._id === taskId) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    let taskObject = data[taskObjectIndex];
+  try {
+    const response = await fetch(`http://localhost:3005/tasks/put/${taskId}`,{method:"PUT",headers: {'Content-Type':'application/json'},body:JSON.stringify({status:statusValue})});
+    const jsonData = await response.json();
+   // console.log(jsonData);
+    let count=0;
+    taskItemsContainer.innerHTML="";
+    for (let task of jsonData) {
+        count++;
+        createAppendTasks(task,count,jsonData)
+        }
+  } catch (error) {
+    console.log(error);
+  }
 
-    if(taskObject.status === true){
-        taskObject.status = false;
-    } else {
-        taskObject.status = true;
-    }
 } 
 
 
 
 function createAppendTasks(task,count,data) {
+  console.log(task)
     let checkboxId = "checkbox" + count;
     let labelId = "label" + count;
 
@@ -41,8 +48,14 @@ function createAppendTasks(task,count,data) {
     let inputElement = document.createElement("input");
     inputElement.type = "checkbox";
     inputElement.id = checkboxId;
+    
+    if (task.status === 'true') {
+      inputElement.checked=true;
+    }else{
+      inputElement.checked=false;
+    }
     inputElement.onclick = function () {
-        onTaskStatusChange(checkboxId, labelId, task._id,data);
+        onTaskStatusChange(checkboxId, labelId, task._id,task,data);
       };
     
     inputElement.classList.add("checkbox-input");
@@ -57,13 +70,19 @@ function createAppendTasks(task,count,data) {
     labelElement.id = labelId;
     labelElement.classList.add("checkbox-label");
     labelElement.textContent = task.name;
-    // if (task.status === true) {
-    //     labelElement.classList.add("checked");
-    // }
+    if (task.status === 'true') {
+      labelElement.classList.add("checked");
+    }else{
+      labelElement.classList.remove("checked");
+    }
     labelContainer.appendChild(labelElement);
-    let checkMessage=document.createElement("span");
-    checkMessage.textContent="click checkbox to change the status as completed."
+
+    let checkMessage=document.createElement("p");
+    checkMessage.textContent="click checkbox to change the mark as completed"
     labelContainer.appendChild(checkMessage);
+    let dateMessage=document.createElement("h3");
+    dateMessage.textContent=task.date;
+    labelContainer.appendChild(dateMessage);
     let deleteIconContainer = document.createElement("div");
     deleteIconContainer.classList.add("delete-icon-container");
     labelContainer.appendChild(deleteIconContainer);
@@ -80,11 +99,11 @@ function createAppendTasks(task,count,data) {
 
 
 
-
-
 addTodoButton.addEventListener("click", async() => {
     let userInputElement = document.getElementById("todoUserInput");
     let userInputValue = userInputElement.value;
+    let newDate = new Date();
+    let dateValue=newDate.toLocaleDateString() +" "+newDate.toLocaleTimeString()
 
     if (userInputValue === "") {
         alert("Enter Valid Text");
@@ -92,7 +111,7 @@ addTodoButton.addEventListener("click", async() => {
     }
     else{ 
             try {
-              const response = await fetch("http://localhost:3005/tasks/add-task",{method:"POST",headers: {'Content-Type':'application/json'},body:JSON.stringify({name:userInputValue})});
+              const response = await fetch("http://localhost:3005/tasks/add-task",{method:"POST",headers: {'Content-Type':'application/json'},body:JSON.stringify({name:userInputValue,date:dateValue})});
               const jsonData = await response.json();
               console.log(jsonData);
              
